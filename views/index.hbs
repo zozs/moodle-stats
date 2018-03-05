@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Moodle stats</title>
+  </head>
+  <body>
+    <h1>Moodle stats for {{course}}</h1>
+
+    <h3>People</h3>
+    <table>
+      <thead>
+        <tr>
+          <th>First name</th>
+          <th>Last name</th>
+          <th>E-mail</th>
+          <th>Number of attempts</th>
+        </tr>
+      </thead>
+      <tbody>
+        {{#each people}}
+        <tr>
+          <td>{{firstname}}</td>
+          <td>{{lastname}}</td>
+          <td>{{email}}</td>
+          <td>{{attempts.length}}</td>
+        </tr>
+        {{/each}}
+      </tbody>
+    </table>
+  </body>
+</html>

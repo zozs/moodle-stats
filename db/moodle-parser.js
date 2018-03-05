@@ -68,9 +68,15 @@ function transformCsvEntry (entry) {
   }
 }
 
-let quizzes = getQuizFilenames()
+module.exports = {
+  quizData: () => {
+    let quizzes = getQuizFilenames()
 
-parseQuizFile(quizzes[0].filename)
-  .then(groupAttempts)
-  .then(data => console.log(data))
-  .catch(e => console.log('Exception:', e))
+    return parseQuizFile(quizzes[0].filename)
+      .then(groupAttempts)
+      .catch(e => {
+        console.log('Exception in parser:', e)
+        throw Error('Exception in parser: ' + JSON.stringify(e))
+      })
+  }
+}

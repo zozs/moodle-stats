@@ -6,6 +6,7 @@
   "scripts": {
     "test": "standard"
   },
+  "repository": "https://github.com/zozs/moodle-stats",
   "author": "Linus Karlsson <linus.karlsson@eit.lth.se>",
   "license": "ISC",
   "devDependencies": {
@@ -13,6 +14,9 @@
   },
   "dependencies": {
     "csv-parse": "^2.0.4",
+    "express": "^4.16.2",
+    "express-promise-router": "^3.0.1",
+    "hbs": "^4.0.1",
     "moment": "^2.21.0"
   }
 }
