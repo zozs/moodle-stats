@@ -1,0 +1,17 @@
+{
+  "name": "moodle-stats",
+  "version": "0.1.0",
+  "description": "Moodle statistics collector",
+  "main": "moodle-stats.js",
+  "scripts": {
+    "test": "standard"
+  },
+  "author": "Linus Karlsson <linus.karlsson@eit.lth.se>",
+  "license": "ISC",
+  "devDependencies": {
+    "standard": "^11.0.0"
+  },
+  "dependencies": {
+    "moment": "^2.21.0"
+  }
+}
