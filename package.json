@@ -12,6 +12,7 @@
     "standard": "^11.0.0"
   },
   "dependencies": {
+    "csv-parse": "^2.0.4",
     "moment": "^2.21.0"
   }
 }

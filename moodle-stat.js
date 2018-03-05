@@ -1,3 +1,4 @@
+const csvParser = require('csv-parse')
 const fs = require('fs')
 const moment = require('moment')
 const { promisify } = require('util')
@@ -11,73 +12,65 @@ function getQuizFilenames () {
     .filter(q => q.filename !== undefined)
 }
 
-// TODO: replace by CSV parser instead...
+function groupAttempts (attempts) {
+  // Returns a list of people, where the attempts are added to each person.
+  // Start by using e-mail as key, later on we return a list of objects as expected.
+  let emails = {}
+  for (let attempt of attempts) {
+    const email = attempt.person.email
+    if (email) {
+      if (!emails.hasOwnProperty(email)) {
+        emails[email] = {...attempt.person} // clone person object
+        emails[email].attempts = []
+      }
 
-async function readQuizFile (filename) {
-  return promisify(fs.readFile)(filename, 'utf8')
+      // Also sort attempts based on starting time.
+      emails[email].attempts.push(attempt.attempt)
+      emails[email].attempts.sort((a, b) => a.started.unix() - b.started.unix())
+    } else {
+      // No e-mail address for this user.
+      throw Error('No email for person: ' + JSON.stringify(attempt.person))
+    }
+  }
+
+  // Finally return all attempts (not sorted by person)
+  return Object.values(emails)
 }
 
 async function parseQuizFile (filename) {
-  // Read a CSV file and return the parsed entries line by line.
-  const header = 'Surname,"First name",Institution,Department,"Email address",State,"Started on",Completed,"Time taken",Grade/10.00'
-  let data = await readQuizFile(filename)
-  let lines = data.split(/\r?\n/)
-  console.log(lines)
-  return lines
-    .filter(line => line !== header)
-    .filter(line => line !== '')
-    .map(parseQuizFileLine)
+  const parseOptions = {
+    columns: true,
+    delimiter: ','
+  }
+
+  let input = await promisify(fs.readFile)(filename, 'utf8')
+  let data = await promisify(csvParser)(input, parseOptions)
+  return data
+    .map(transformCsvEntry)
+    .filter(a => a.person.lastname !== 'Overall average')
 }
 
-function parseQuizFileLine (line) {
-  if (line.trim() === '') {
-    return {}
-  }
-  let parts = line.split(/,/)
-  if (parts.length !== 10) {
-    console.log(parts)
-    throw Error('Invalid line: ' + line)
-  }
+function transformCsvEntry (entry) {
   const dateFormat = 'DD MMM YYYY hh:mm a'
   return {
     'person': {
-      'lastname': parts[0],
-      'firstname': parts[1],
-      'email': parts[4]
+      'lastname': entry['Surname'],
+      'firstname': entry['First name'],
+      'email': entry['Email address']
     },
     'attempt': {
-      'state': parts[5],
-      'started': moment(parts[6], dateFormat),
-      'ended': moment(parts[7], dateFormat),
-      'duration': parts[8], // TODO: parse duration?
-      'score': parseFloat(parts[9])
+      'state': entry['State'],
+      'started': moment(entry['Started on'], dateFormat),
+      'ended': moment(entry['Completed'], dateFormat),
+      'duration': entry['Time taken'], // TODO: parse duration?
+      'score': parseFloat(entry['Grade/10.00'])
     }
   }
 }
 
 let quizzes = getQuizFilenames()
 
-function groupAttempts (attempts) {
-  // Returns a list of people, where the attempts are added to each person.
-  // TODO: Also make sure attempts are sorted by starting time.
-
-  // Start by using e-mail as key, later on we return a list of objects as expected.
-  let emails = {}
-  for (let attempt of attempts) {
-    if (!emails.hasOwnProperty(attempt.person.email)) {
-      emails[attempt.email] = {...attempt.person} // clone person object
-      emails[attempt.email].attempts = []
-    }
-
-    emails[attempt.email].attempts.push(attempt.attempt)
-  }
-
-  // Now sort attempts based on starting time.
-
-  // Finally return all attempts (unsorted)
-  return Object.values(emails)
-}
-
 parseQuizFile(quizzes[0].filename)
+  .then(groupAttempts)
   .then(data => console.log(data))
   .catch(e => console.log('Exception:', e))
