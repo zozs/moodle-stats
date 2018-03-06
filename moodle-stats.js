@@ -2,7 +2,8 @@ const express = require('express')
 const mountRoutes = require('./routes')
 
 const app = express()
-mountRoutes(app)
+const rootFsPath = __dirname
+mountRoutes(app, rootFsPath)
 
 let port = process.env.PORT || 3000
 

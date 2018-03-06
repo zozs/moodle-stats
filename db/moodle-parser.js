@@ -71,7 +71,7 @@ function transformCsvEntry (entry) {
 module.exports = {
   quizData: () => {
     let quizzes = getQuizFilenames()
-
+    // TODO: filter on finished attempts?
     return parseQuizFile(quizzes[0].filename)
       .then(groupAttempts)
       .catch(e => {

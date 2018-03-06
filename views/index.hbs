@@ -4,12 +4,27 @@
   <head>
     <meta charset="utf-8">
     <title>Moodle stats</title>
+    <link rel="stylesheet" type="text/css" href="//cdn.datatables.net/1.10.16/css/jquery.dataTables.min.css">
+    <script src="/static/jquery/jquery.min.js"></script>
+    <script src="//cdn.datatables.net/1.10.16/js/jquery.dataTables.min.js"></script>
+    <script src="/static/index.js"></script>
+
+    <style>
+      td.details-control {
+          background: url('/static/details_open.png') no-repeat center center;
+          cursor: pointer;
+      }
+      tr.shown td.details-control {
+          background: url('/static/details_close.png') no-repeat center center;
+      }
+    </style>
   </head>
   <body>
     <h1>Moodle stats for {{course}}</h1>
 
     <h3>People</h3>
-    <table>
+
+    <table id="quizTable" class="display" cellspacing="0">
       <thead>
         <tr>
           <th colspan="3">Personal data</th>
@@ -19,9 +34,9 @@
           <th colspan="3">All quizzes</th>
         </tr>
         <tr>
+          <th></th>
           <th>First name</th>
           <th>Last name</th>
-          <th>E-mail</th>
 
           <th>Attempts</th>
           <th>Before pass</th>
@@ -38,19 +53,8 @@
           <th>Attempts</th>
           <th>Before pass</th>
           <th>Score</th>
-          <th></th>
         </tr>
       </thead>
-      <tbody>
-        {{#each people}}
-        <tr>
-          <td>{{firstname}}</td>
-          <td>{{lastname}}</td>
-          <td>{{email}}</td>
-          <td>{{attempts.length}}</td>
-        </tr>
-        {{/each}}
-      </tbody>
     </table>
   </body>
 </html>
